@@ -1,3 +1,5 @@
+pub mod animations;
+
 use cobs_rs::stuff;
 use serialport::TTYPort;
 use std::{convert::TryInto, io::Write};
@@ -16,10 +18,10 @@ type Result<T> = std::result::Result<T, LedControllerError>;
 
 const DEFAULT_BAUD_RATE: u32 = 115200;
 
-const PIXEL_COUNT: usize = 40;
+pub const PIXEL_COUNT: usize = 40;
 
-const BIGGER_RING_PIXEL_COUNT: usize = 24;
-const SMALLER_RING_PIXEL_COUNT: usize = 16;
+pub const BIGGER_RING_PIXEL_COUNT: usize = 24;
+pub const SMALLER_RING_PIXEL_COUNT: usize = 16;
 
 pub const BIGGER_TOP_INDEX: usize = 7;
 pub const BIGGER_BOTTOM_INDEX: usize = 19;
@@ -50,8 +52,18 @@ pub const ALL_COLORS: [RGB; 10] = [
     BRIGHT_PURPLE,
 ];
 
-fn corrected_pixel_index(index: usize) -> usize {
-    let index = index % PIXEL_COUNT;
+pub const NORMAL_COLORS: [RGB; 5] = [RED, BLUE, GREEN, YELLOW, PURPLE];
+
+pub const BRIGHT_COLORS: [RGB; 5] = [
+    BRIGHT_RED,
+    BRIGHT_BLUE,
+    BRIGHT_GREEN,
+    BRIGHT_YELLOW,
+    BRIGHT_PURPLE,
+];
+
+fn corrected_pixel_index(index: i32) -> usize {
+    let index = index.rem_euclid(PIXEL_COUNT as i32) as usize;
     if index >= BIGGER_RING_PIXEL_COUNT {
         let index_on_smaller = index - BIGGER_RING_PIXEL_COUNT;
         SMALLER_RING_PIXEL_COUNT - 1 - index_on_smaller + BIGGER_RING_PIXEL_COUNT
@@ -72,6 +84,15 @@ impl RGB {
         RGB { red, green, blue }
     }
 
+    pub fn fade_out(&self, percentage: f32) -> Self {
+        let percentage = percentage.clamp(0.0, 1.0);
+        RGB {
+            red: (self.red as f32 * percentage) as u8,
+            green: (self.green as f32 * percentage) as u8,
+            blue: (self.blue as f32 * percentage) as u8,
+        }
+    }
+
     fn from_data(color: [u8; 3]) -> Self {
         RGB {
             red: color[0],
@@ -87,6 +108,12 @@ impl RGB {
 
 pub struct ColorPacket {
     payload: [u8; PIXEL_COUNT * 3],
+}
+
+impl Default for ColorPacket {
+    fn default() -> Self {
+        ColorPacket::off()
+    }
 }
 
 impl ColorPacket {
@@ -111,14 +138,14 @@ impl ColorPacket {
         }
     }
 
-    pub fn get_pixel(&self, index: usize) -> RGB {
+    pub fn get_pixel(&self, index: i32) -> RGB {
         let index = corrected_pixel_index(index);
         let offset = index * 3;
         let slice = self.payload[offset..offset + 3].try_into().unwrap();
         RGB::from_data(slice)
     }
 
-    pub fn set_pixel(&mut self, index: usize, color: RGB) {
+    pub fn set_pixel(&mut self, index: i32, color: RGB) {
         let index = corrected_pixel_index(index);
         let offset = index * 3;
         self.payload[offset] = color.red;
@@ -177,8 +204,20 @@ mod tests {
     fn get_pixel_works_for_out_of_bounds() {
         let color = RGB::new(255, 0, 0);
         let packet = ColorPacket::with_color(color);
-        let pixel = packet.get_pixel(PIXEL_COUNT + 3);
+        let pixel = packet.get_pixel(PIXEL_COUNT as i32 + 3);
         assert_eq!(pixel, color);
+    }
+
+    #[test]
+    fn get_pixel_wraps_negative() {
+        let red = RGB::new(255, 0, 0);
+        let green = RGB::new(0, 255, 0);
+        let mut packet = ColorPacket::with_color(red);
+        packet.set_pixel(0, green);
+        assert_eq!(red, packet.get_pixel(39));
+        assert_eq!(green, packet.get_pixel(40));
+        assert_eq!(red, packet.get_pixel(41));
+        assert_eq!(red, packet.get_pixel(1));
     }
 
     #[test]
@@ -197,10 +236,22 @@ mod tests {
         let red = RGB::new(255, 0, 0);
         let green = RGB::new(0, 255, 0);
         let mut packet = ColorPacket::with_color(red);
-        packet.set_pixel(PIXEL_COUNT + 10, green);
+        packet.set_pixel(PIXEL_COUNT as i32 + 10, green);
         assert_eq!(red, packet.get_pixel(9));
         assert_eq!(green, packet.get_pixel(10));
         assert_eq!(red, packet.get_pixel(11));
+    }
+
+    #[test]
+    fn set_pixel_wraps_negative() {
+        let red = RGB::new(255, 0, 0);
+        let green = RGB::new(0, 255, 0);
+        let mut packet = ColorPacket::with_color(red);
+        packet.set_pixel(-1, green);
+        assert_eq!(red, packet.get_pixel(38));
+        assert_eq!(green, packet.get_pixel(39));
+        assert_eq!(red, packet.get_pixel(40));
+        assert_eq!(red, packet.get_pixel(0));
     }
 
     #[test]

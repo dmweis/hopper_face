@@ -15,11 +15,11 @@ struct Args {
 
 fn main() -> Result<()> {
     let args: Args = Args::parse();
-
     let mut controller = hopper_face::LedController::open(&args.port)?;
-    for color in hopper_face::ALL_COLORS.iter().cycle() {
-        sleep(Duration::from_secs(2));
-        controller.send(&hopper_face::ColorPacket::with_color(*color))?;
+    loop {
+        for frame in hopper_face::animations::LarsonScanner::new(hopper_face::BRIGHT_PURPLE) {
+            controller.send(&frame)?;
+            sleep(Duration::from_secs_f32(0.03));
+        }
     }
-    Ok(())
 }
