@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["CycleColors",""],["LarsonScanner",""],["RunAnimation",""]]});
+initSidebarItems({"enum":[["Animation",""]],"struct":[["CycleColors",""],["LarsonScanner",""],["RunAnimation",""]]});

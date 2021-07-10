@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["hopper_face"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"struct\" href=\"hopper_face/struct.RGB.html\" title=\"struct hopper_face::RGB\">RGB</a>","synthetic":false,"types":["hopper_face::RGB"]}];
+implementors["hopper_face"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"struct\" href=\"hopper_face/driver/struct.RGB.html\" title=\"struct hopper_face::driver::RGB\">RGB</a>","synthetic":false,"types":["hopper_face::driver::RGB"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
