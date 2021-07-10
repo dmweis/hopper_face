@@ -15,9 +15,10 @@ struct Args {
 
 fn main() -> Result<()> {
     let args: Args = Args::parse();
-    let mut controller = hopper_face::LedController::open(&args.port)?;
+    let mut controller = hopper_face::LedDriver::open(&args.port)?;
     loop {
-        for frame in hopper_face::animations::LarsonScanner::new(hopper_face::BRIGHT_PURPLE) {
+        for frame in hopper_face::animations::LarsonScanner::new(hopper_face::driver::BRIGHT_PURPLE)
+        {
             controller.send(&frame)?;
             sleep(Duration::from_secs_f32(0.03));
         }

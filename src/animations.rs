@@ -1,4 +1,4 @@
-use crate::{
+use crate::driver::{
     ColorPacket, ALL_COLORS, BIGGER_RING_PIXEL_COUNT, BRIGHT_COLORS, NORMAL_COLORS, PIXEL_COUNT,
     RGB, SMALLER_RING_PIXEL_COUNT,
 };
@@ -11,6 +11,29 @@ fn map(value: i32, in_min: i32, in_max: i32, out_min: i32, out_max: i32) -> i32 
     let out_max = out_max as f32;
     let result = (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     result.round() as i32
+}
+
+#[derive(Debug)]
+pub enum Animation {
+    LarsonScanner(RGB),
+    RunAnimation(RGB),
+    CycleAllColors,
+    CycleBrightColors,
+    CycleNormalColors,
+    Off,
+}
+
+impl Animation {
+    pub fn to_iterator(&self) -> Box<dyn Iterator<Item = ColorPacket>> {
+        match self {
+            Animation::LarsonScanner(color) => Box::new(LarsonScanner::new(*color)),
+            Animation::RunAnimation(color) => Box::new(RunAnimation::new(*color)),
+            Animation::CycleAllColors => Box::new(CycleColors::all_colors()),
+            Animation::CycleBrightColors => Box::new(CycleColors::bright_colors()),
+            Animation::CycleNormalColors => Box::new(CycleColors::normal_colors()),
+            Animation::Off => Box::new(std::iter::repeat(ColorPacket::off())),
+        }
+    }
 }
 
 pub struct LarsonScanner {
