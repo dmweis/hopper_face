@@ -1,5 +1,4 @@
-use clap::Clap;
-use ctrlc;
+use clap::Parser;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread::sleep;
@@ -8,8 +7,8 @@ use std::time::Duration;
 type Result<T> = std::result::Result<T, hopper_face::LedControllerError>;
 
 /// Hopper face controller
-#[derive(Clap)]
-#[clap(version = "0.0.1", author = "David Weis <dweis7@gmail.com>")]
+#[derive(Parser)]
+#[clap(author, version)]
 struct Args {
     /// Serial port to use
     #[clap(short, long)]

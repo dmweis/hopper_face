@@ -9,6 +9,6 @@ edition = "2018"
 cobs-rs = "1.1.1"
 serialport = { version = "4.0.1", default-features = false }
 thiserror = "1.0"
-clap = "3.0.0-beta.2"
+clap = { version = "3.2", features = ["derive"] }
 log = "0.4"
 ctrlc = "3.1"
