@@ -90,6 +90,10 @@ impl FaceController {
         self.animation(Animation::Breathing(color))
     }
 
+    pub fn solid_color(&self, color: RGB) -> Result<()> {
+        self.animation(Animation::SolidColor(color))
+    }
+
     pub fn off(&self) -> Result<()> {
         self.animation(Animation::Off)
     }

@@ -28,6 +28,7 @@ pub const BIGGER_BOTTOM_INDEX: usize = 19;
 pub const SMALLER_TOP_INDEX: usize = 35;
 pub const SMALLER_BOTTOM_INDEX: usize = 27;
 
+pub const OFF: RGB = RGB::new(0, 0, 0);
 pub const RED: RGB = RGB::new(10, 0, 0);
 pub const BLUE: RGB = RGB::new(0, 0, 10);
 pub const GREEN: RGB = RGB::new(0, 10, 0);

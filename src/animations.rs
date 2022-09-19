@@ -1,6 +1,6 @@
 use crate::driver::{
     ColorPacket, ALL_COLORS, BIGGER_RING_PIXEL_COUNT, BLUE, BRIGHT_COLORS, GREEN, NORMAL_COLORS,
-    PIXEL_COUNT, RED, RGB, SMALLER_RING_PIXEL_COUNT,
+    OFF, PIXEL_COUNT, RED, RGB, SMALLER_RING_PIXEL_COUNT,
 };
 use std::time::Duration;
 
@@ -26,6 +26,7 @@ pub enum Animation {
     CountDownBasic,
     CountDown(Vec<RGB>),
     Breathing(RGB),
+    SolidColor(RGB),
     Off,
 }
 
@@ -40,8 +41,36 @@ impl Animation {
             Animation::CountDownBasic => Box::new(CountDownAnimation::default()),
             Animation::CountDown(colors) => Box::new(CountDownAnimation::new(colors.clone())),
             Animation::Breathing(color) => Box::new(Breathing::new(*color)),
-            Animation::Off => Box::new(std::iter::repeat(ColorPacket::off())),
+            Animation::SolidColor(color) => Box::new(SolidColor::new(*color)),
+            Animation::Off => Box::new(SolidColor::off()),
         }
+    }
+}
+
+pub struct SolidColor {
+    frame: ColorPacket,
+}
+
+impl SolidColor {
+    pub fn new(color: RGB) -> Self {
+        SolidColor {
+            frame: ColorPacket::with_color(color),
+        }
+    }
+
+    pub fn off() -> Self {
+        SolidColor {
+            frame: ColorPacket::with_color(OFF),
+        }
+    }
+}
+
+impl Iterator for SolidColor {
+    type Item = ColorPacket;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
+        Some(self.frame.clone())
     }
 }
 

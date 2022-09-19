@@ -9,6 +9,14 @@ fn main() {
         .unwrap();
     sleep(Duration::from_secs(10));
 
+    face_controller.off().unwrap();
+    sleep(Duration::from_secs(3));
+
+    face_controller
+        .solid_color(hopper_face::driver::BRIGHT_RED)
+        .unwrap();
+    sleep(Duration::from_secs(3));
+
     face_controller
         .run_animation(hopper_face::driver::PURPLE)
         .unwrap();
