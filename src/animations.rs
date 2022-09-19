@@ -1,6 +1,6 @@
 use crate::driver::{
-    ColorPacket, ALL_COLORS, BIGGER_RING_PIXEL_COUNT, BRIGHT_COLORS, NORMAL_COLORS, PIXEL_COUNT,
-    RGB, SMALLER_RING_PIXEL_COUNT,
+    ColorPacket, ALL_COLORS, BIGGER_RING_PIXEL_COUNT, BLUE, BRIGHT_COLORS, GREEN, NORMAL_COLORS,
+    PIXEL_COUNT, RED, RGB, SMALLER_RING_PIXEL_COUNT,
 };
 
 fn map(value: i32, in_min: i32, in_max: i32, out_min: i32, out_max: i32) -> i32 {
@@ -20,6 +20,8 @@ pub enum Animation {
     CycleAllColors,
     CycleBrightColors,
     CycleNormalColors,
+    CountDownBasic,
+    CountDown(Vec<RGB>),
     Off,
 }
 
@@ -31,6 +33,8 @@ impl Animation {
             Animation::CycleAllColors => Box::new(CycleColors::all_colors()),
             Animation::CycleBrightColors => Box::new(CycleColors::bright_colors()),
             Animation::CycleNormalColors => Box::new(CycleColors::normal_colors()),
+            Animation::CountDownBasic => Box::new(CountDownAnimation::default()),
+            Animation::CountDown(colors) => Box::new(CountDownAnimation::new(colors.clone())),
             Animation::Off => Box::new(std::iter::repeat(ColorPacket::off())),
         }
     }
@@ -140,5 +144,46 @@ impl Iterator for CycleColors {
         let result = Some(ColorPacket::with_color(self.colors[self.index]));
         self.index += 1;
         result
+    }
+}
+
+#[derive(Debug)]
+pub struct CountDownAnimation {
+    index: usize,
+    frame: ColorPacket,
+    colors: Vec<RGB>,
+}
+
+impl Default for CountDownAnimation {
+    fn default() -> Self {
+        Self::new(vec![BLUE, RED, GREEN])
+    }
+}
+
+impl CountDownAnimation {
+    pub fn new(colors: Vec<RGB>) -> Self {
+        Self {
+            index: 0,
+            frame: ColorPacket::off(),
+            colors,
+        }
+    }
+}
+
+impl Iterator for CountDownAnimation {
+    type Item = ColorPacket;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= PIXEL_COUNT {
+            self.colors.pop();
+            self.index = 0;
+        }
+        if self.colors.is_empty() {
+            return None;
+        }
+        self.frame
+            .set_pixel(self.index as i32, *self.colors.first().unwrap());
+        self.index += 1;
+        Some(self.frame.clone())
     }
 }

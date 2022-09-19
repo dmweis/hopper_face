@@ -61,8 +61,40 @@ impl FaceController {
     }
 
     pub fn larson_scanner(&self, color: RGB) -> Result<()> {
+        self.animation(Animation::LarsonScanner(color))
+    }
+
+    pub fn run_animation(&self, color: RGB) -> Result<()> {
+        self.animation(Animation::RunAnimation(color))
+    }
+
+    pub fn cycle_all_colors(&self) -> Result<()> {
+        self.animation(Animation::CycleAllColors)
+    }
+
+    pub fn cycle_bright_colors(&self) -> Result<()> {
+        self.animation(Animation::CycleBrightColors)
+    }
+
+    pub fn cycle_normal_colors(&self) -> Result<()> {
+        self.animation(Animation::CycleNormalColors)
+    }
+
+    pub fn count_down_basic(&self) -> Result<()> {
+        self.animation(Animation::CountDownBasic)
+    }
+
+    pub fn count_down(&self, colors: Vec<RGB>) -> Result<()> {
+        self.animation(Animation::CountDown(colors))
+    }
+
+    pub fn off(&self) -> Result<()> {
+        self.animation(Animation::Off)
+    }
+
+    fn animation(&self, animation: Animation) -> Result<()> {
         self.sender
-            .send(ColorCommand::Animation(Animation::LarsonScanner(color)))
+            .send(ColorCommand::Animation(animation))
             .map_err(|_| LedControllerError::CommThreadError)?;
         Ok(())
     }
