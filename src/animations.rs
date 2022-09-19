@@ -25,6 +25,7 @@ pub enum Animation {
     CycleNormalColors,
     CountDownBasic,
     CountDown(Vec<RGB>),
+    Breathing(RGB),
     Off,
 }
 
@@ -38,6 +39,7 @@ impl Animation {
             Animation::CycleNormalColors => Box::new(CycleColors::normal_colors()),
             Animation::CountDownBasic => Box::new(CountDownAnimation::default()),
             Animation::CountDown(colors) => Box::new(CountDownAnimation::new(colors.clone())),
+            Animation::Breathing(color) => Box::new(Breathing::new(*color)),
             Animation::Off => Box::new(std::iter::repeat(ColorPacket::off())),
         }
     }
@@ -193,5 +195,35 @@ impl Iterator for CountDownAnimation {
         self.index += 1;
         std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
         Some(self.frame.clone())
+    }
+}
+
+pub struct Breathing {
+    color: RGB,
+    breathing: Box<dyn Iterator<Item = f32>>,
+}
+
+impl Breathing {
+    pub fn new(color: RGB) -> Self {
+        let breathing = (2..=10)
+            .rev()
+            .chain(2..=10)
+            .cycle()
+            .map(|value| value as f32 / 10.0);
+
+        Self {
+            color,
+            breathing: Box::new(breathing),
+        }
+    }
+}
+
+impl Iterator for Breathing {
+    type Item = ColorPacket;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let frame = ColorPacket::with_color(self.color.fade_out(self.breathing.next().unwrap()));
+        std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
+        Some(frame)
     }
 }

@@ -86,6 +86,10 @@ impl FaceController {
         self.animation(Animation::CountDown(colors))
     }
 
+    pub fn breathing(&self, color: RGB) -> Result<()> {
+        self.animation(Animation::Breathing(color))
+    }
+
     pub fn off(&self) -> Result<()> {
         self.animation(Animation::Off)
     }
