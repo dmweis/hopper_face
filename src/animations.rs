@@ -205,9 +205,9 @@ pub struct Breathing {
 
 impl Breathing {
     pub fn new(color: RGB) -> Self {
-        let breathing = (2..=10)
+        let breathing = (0..=10)
             .rev()
-            .chain(2..=10)
+            .chain(0..=10)
             .cycle()
             .map(|value| value as f32 / 10.0);
 
@@ -223,7 +223,7 @@ impl Iterator for Breathing {
 
     fn next(&mut self) -> Option<Self::Item> {
         let frame = ColorPacket::with_color(self.color.fade_out(self.breathing.next().unwrap()));
-        std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
+        std::thread::sleep(Duration::from_millis(100));
         Some(frame)
     }
 }
