@@ -38,8 +38,9 @@ To set this up run:
 
 ```shell
 rustup target add armv7-unknown-linux-musleabihf
+rustup target add aarch64-unknown-linux-musl
 sudo apt update
-sudo apt install gcc-arm-linux-gnueabihf
+sudo apt install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
 ```
 
 Then compile for arm with `cargo build --target=armv7-unknown-linux-musleabihf`
