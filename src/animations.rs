@@ -189,7 +189,7 @@ impl Iterator for CountDownAnimation {
             return None;
         }
         self.frame
-            .set_pixel(self.index as i32, *self.colors.first().unwrap());
+            .set_pixel(self.index as i32, *self.colors.last().unwrap());
         self.index += 1;
         std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
         Some(self.frame.clone())
