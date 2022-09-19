@@ -2,6 +2,9 @@ use crate::driver::{
     ColorPacket, ALL_COLORS, BIGGER_RING_PIXEL_COUNT, BLUE, BRIGHT_COLORS, GREEN, NORMAL_COLORS,
     PIXEL_COUNT, RED, RGB, SMALLER_RING_PIXEL_COUNT,
 };
+use std::time::Duration;
+
+const DEFAULT_ANIMATION_SLEEP: Duration = Duration::from_millis(30);
 
 fn map(value: i32, in_min: i32, in_max: i32, out_min: i32, out_max: i32) -> i32 {
     let value = value as f32;
@@ -76,6 +79,7 @@ impl Iterator for LarsonScanner {
         frame.set_pixel(index_bigger - 2, self.color.fade_out(0.2));
         frame.set_pixel(index_bigger - 3, self.color.fade_out(0.1));
         self.index += 1;
+        std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
         Some(frame)
     }
 }
@@ -102,6 +106,7 @@ impl Iterator for RunAnimation {
         let mut frame = ColorPacket::default();
         frame.set_pixel(self.index, self.color);
         self.index += 1;
+        std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
         Some(frame)
     }
 }
@@ -143,6 +148,7 @@ impl Iterator for CycleColors {
         }
         let result = Some(ColorPacket::with_color(self.colors[self.index]));
         self.index += 1;
+        std::thread::sleep(Duration::from_secs(1));
         result
     }
 }
@@ -177,6 +183,7 @@ impl Iterator for CountDownAnimation {
         if self.index >= PIXEL_COUNT {
             self.colors.pop();
             self.index = 0;
+            self.frame = ColorPacket::off();
         }
         if self.colors.is_empty() {
             return None;
@@ -184,6 +191,7 @@ impl Iterator for CountDownAnimation {
         self.frame
             .set_pixel(self.index as i32, *self.colors.first().unwrap());
         self.index += 1;
+        std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
         Some(self.frame.clone())
     }
 }

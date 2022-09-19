@@ -7,8 +7,7 @@ pub use driver::{ColorPacket, LedControllerError, LedDriver, RGB};
 use log::*;
 use std::{
     sync::mpsc::{self, sync_channel, SyncSender},
-    thread::{sleep, spawn, JoinHandle},
-    time::Duration,
+    thread::{spawn, JoinHandle},
 };
 
 enum ColorCommand {
@@ -48,7 +47,6 @@ impl FaceController {
                         error!("Failed to send message to face controller");
                         break;
                     }
-                    sleep(Duration::from_secs_f32(0.03));
                 } else {
                     iterator = animation.to_iterator();
                 }
