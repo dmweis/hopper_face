@@ -28,6 +28,7 @@ impl FaceController {
         let join_handle = spawn(move || {
             let mut animation = Animation::Off;
             let mut iterator = animation.to_iterator();
+            #[allow(clippy::while_let_loop)]
             loop {
                 if let Ok(optional_message) = rx.try_recv_optional() {
                     if let Some(message) = optional_message {

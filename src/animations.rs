@@ -286,7 +286,7 @@ impl Iterator for SpeakingAnimation {
         let mut rng = thread_rng();
         let steps: i32 = rng.gen_range(1..=3);
 
-        let mut frame = ColorPacket::with_color(self.color);
+        let mut frame = ColorPacket::off();
 
         for side_index in &[
             BIGGER_LEFT_SIDE,
