@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"hopper_face":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.73.0/core/marker/trait.StructuralPartialEq.html\" title=\"trait core::marker::StructuralPartialEq\">StructuralPartialEq</a> for <a class=\"struct\" href=\"hopper_face/driver/struct.RGB.html\" title=\"struct hopper_face::driver::RGB\">RGB</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
