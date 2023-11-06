@@ -94,6 +94,10 @@ impl FaceController {
         self.animation(Animation::SolidColor(color))
     }
 
+    pub fn speaking(&self, color: RGB) -> Result<()> {
+        self.animation(Animation::Speaking(color))
+    }
+
     pub fn off(&self) -> Result<()> {
         self.animation(Animation::Off)
     }
