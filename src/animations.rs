@@ -1,3 +1,5 @@
+use rand::{thread_rng, Rng};
+
 use crate::driver::{
     ColorPacket, ALL_COLORS, BIGGER_RING_PIXEL_COUNT, BLUE, BRIGHT_COLORS, GREEN, NORMAL_COLORS,
     OFF, PIXEL_COUNT, RED, RGB, SMALLER_RING_PIXEL_COUNT,
@@ -27,6 +29,7 @@ pub enum Animation {
     CountDown(Vec<RGB>),
     Breathing(RGB),
     SolidColor(RGB),
+    Speaking(RGB),
     Off,
 }
 
@@ -38,10 +41,12 @@ impl Animation {
             Animation::CycleAllColors => Box::new(CycleColors::all_colors()),
             Animation::CycleBrightColors => Box::new(CycleColors::bright_colors()),
             Animation::CycleNormalColors => Box::new(CycleColors::normal_colors()),
+            #[allow(clippy::box_default)]
             Animation::CountDownBasic => Box::new(CountDownAnimation::default()),
             Animation::CountDown(colors) => Box::new(CountDownAnimation::new(colors.clone())),
             Animation::Breathing(color) => Box::new(Breathing::new(*color)),
             Animation::SolidColor(color) => Box::new(SolidColor::new(*color)),
+            Animation::Speaking(color) => Box::new(SpeakingAnimation::new(*color)),
             Animation::Off => Box::new(SolidColor::off()),
         }
     }
@@ -255,6 +260,48 @@ impl Iterator for Breathing {
     fn next(&mut self) -> Option<Self::Item> {
         let frame = ColorPacket::with_color(self.color.fade_out(self.breathing.next().unwrap()));
         std::thread::sleep(Duration::from_millis(20));
+        Some(frame)
+    }
+}
+
+pub struct SpeakingAnimation {
+    color: RGB,
+}
+
+impl SpeakingAnimation {
+    pub fn new(color: RGB) -> Self {
+        Self { color }
+    }
+}
+
+impl Iterator for SpeakingAnimation {
+    type Item = ColorPacket;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        const BIGGER_LEFT_SIDE: i32 = 2;
+        const BIGGER_RIGHT_SIDE: i32 = 18;
+        const SMALLER_LEFT_SIDE: i32 = 30;
+        const SMALLER_RIGHT_SIDE: i32 = 38;
+
+        let mut rng = thread_rng();
+        let steps: i32 = rng.gen_range(1..=3);
+
+        let mut frame = ColorPacket::with_color(self.color);
+
+        for side_index in &[
+            BIGGER_LEFT_SIDE,
+            BIGGER_RIGHT_SIDE,
+            SMALLER_LEFT_SIDE,
+            SMALLER_RIGHT_SIDE,
+        ] {
+            frame.set_pixel(*side_index, self.color);
+            for step in 0..steps {
+                frame.set_pixel(step - side_index, self.color.fade_out(0.15 * step as f32));
+                frame.set_pixel(step + side_index, self.color.fade_out(0.15 * step as f32));
+            }
+        }
+
+        std::thread::sleep(DEFAULT_ANIMATION_SLEEP);
         Some(frame)
     }
 }
